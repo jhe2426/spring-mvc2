@@ -138,6 +138,15 @@ public class BasicController {
         return "basic/block";
     }
 
+    @GetMapping("/javascript")
+    public String javascript(Model model) {
+
+        model.addAttribute("user", new User("User\"A\"", 10));
+        addUsers(model);
+
+        return "basic/javascript";
+    }
+
     private void addUsers(Model model) {
         List<User> list = new ArrayList<>();
         list.add(new User("UserA", 10));
@@ -148,7 +157,7 @@ public class BasicController {
     }
 
     @Data
-    static class User {
+    public static class User {
         private String username;
         private int age;
 

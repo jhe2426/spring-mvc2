@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!-- 자바스크립트 인라인 사용 전 -->
+<script>
+    /*
+        var username = [[${user.username}]]; 이렇게 입력을 하면 자바스크립터 에러가 발생한다.
+        왜냐하면 자바스크립트 문법으로는 문자열이 들어가면 꼭 "" 안에 입력을 해야하는데
+        저렇게 작성하면 그냥 UserA 이렇게만 값을 치환해서 넣어주기 때문이다.
+        그래서 에러 안나게 하려면 var username = "[[${user.username}]]";
+        이렇게 작성하는 방법도 있다.
+    */
+    var username = [[${user.username}]];
+    var age = [[${user.age}]];
+
+    //자바스크립트 내추럴 템플릿
+    var username2 = /*[[${user.username}]]*/ "test username";
+
+    //객체
+    /*
+
+    */
+    var user = [[${user}]];
+</script>
+
+<!-- 자바스크립트 인라인 사용 후 -->
+<script th:inline="javascript">
+    var username = [[${user.username}]];
+    var age = [[${user.age}]];
+
+    //자바스크립트 내추럴 템플릿
+    var username2 = /*[[${user.username}]]*/ "test username";
+
+    //객체
+        /*
+        자바스크립트 인라인을 사용하면 model.addAttribute("user", new User("User\"A\"", 10));에
+        \"처럼 자바스크립트에서 문제가 될 수 있는 문자가 포함되어 있어도 이스케이프 처리를 해줌
+        \"를 타임리프가 자바스크립트 문법에 맞게 escape해서 생성을 해줌
+        model.addAttribute("user", new User("User\"A\"", 10)); 전달을 user"A" 이런식으로 되는데
+        자바스크립트 인라인을 하지 않으면 "의 이스케이프가 HTML 이스케이프가 적용되어 &quot;이런식으로 변환이 되어버림 그래서 JS 문맥에 맞는 escape가 되지 않을 수 있고,
+        그 경우 문자열이 깨져 문법 에러가 발생할 수 있음 아래의 코드가 문법에 깨져 에러가 발생하는 코드임
+            이스케이프: 특수 문자가 코드 문법으로 해석되지 않도록 다른 안전한 형태로 바꾸는 것
+    */
+    var user = [[${user}]];
+</script>
+
+<!-- 자바스크립트 인라인 each -->
+<script th:inline="javascript">
+    [# th:each="user, stat : ${users}"]
+    var user[[${stat.count}]] = [[${user}]];
+    [/]
+</script>
+
+</body>
+</html>
