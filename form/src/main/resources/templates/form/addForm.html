@@ -69,11 +69,26 @@
             체크 박스를 체크하지 않으면 스프링 MVC가 '_open'만 있는 것을 확인하고, 'open'의 값이 체크되지 않았다고 인식한다.
             그래서 이 경우 서버에서 Boolean 타입을 찍어보면 결과가 null이 아니라 false인 것을 확인할 수 있다.
         -->
-        <div>판매 여부</div>
+<!--
+    <div>판매 여부</div>
         <div>
             <div class="form-check">
                 <input type="checkbox" id="open" name="open" class="form-check-input">
-                <input type="hidden" name="_open" value="on"/> <!-- 히든 필드 추가 -->
+                <input type="hidden" name="_open" value="on"/> &lt;!&ndash; 히든 필드 추가 &ndash;&gt;
+                <label for="open" class="form-check-label">판매 오픈</label>
+            </div>
+        </div>
+-->
+
+        <!-- single checkbox -->
+        <!--
+           th:field="*{open}" 이렇게 타임리프를 사용하면 타임리프가 자동으로 <input type="hidden" name="_open" value="on"/> 코드를
+            자동으로 생성해주어 편리하게 체크박스의 선택, 해제의 값을 받아올 수 있게 된다.
+        -->
+        <div>판매 여부</div>
+        <div>
+            <div class="form-check">
+                <input type="checkbox" id="open" th:field="*{open}" class="form-check-input">
                 <label for="open" class="form-check-label">판매 오픈</label>
             </div>
         </div>
