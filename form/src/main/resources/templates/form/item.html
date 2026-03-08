@@ -55,6 +55,22 @@
         </div>
     </div>
 
+    <!-- multi checkbox -->
+    <!--
+        아이템 상세 페이지의 경우 저장된 item 객체에 속성에 대한 값들이 넘어오게 되는데
+        이때 th:field="${item.regions}"를 지정하게 되면 value값은 item.regions에 저장된 값으로 바인딩된다.
+        item.regions에는 선택된 지역 정보가 리스트 형태로 저장되어 있으므로, modelAttribute로 전달된 전체 지역 목록을 반복문으로 출력하면서
+        해당 지역이 item.regions에 포함되어 있으면 체크박스를 체크된 상태로 표시한다.
+    -->
+    <div>
+        <div>등록 지역</div>
+        <div th:each="region : ${regions}" class="form-check form-check-inline">
+            <input type="checkbox" th:field="${item.regions}" th:value="${region.key}" class="form-check-input" disabled>
+            <label th:for="${#ids.prev('regions')}"
+                   th:text="${region.value}" class="form-check-label">서울</label>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
