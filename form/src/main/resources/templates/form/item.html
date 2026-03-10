@@ -82,6 +82,26 @@
         </div>
     </div>
 
+    <!-- SELECT -->
+    <div>
+        <div>배송 방식</div>
+        <!--
+            타임리프가 th:field="${item.deliveryCode}"의 값과 option 태그의 value 속성 값을 비교하여
+            같은 값에 대해여 selected="selected" selected 속성 코드를 자동으로 작성해준다.
+            배송 방식 선택을 아무것도 선택하지 않으면 클라이언트는 ""를 전송하기 때문에 ${item.deliveryCode}가 "" 값이므로
+            <option value="">==배송 방식 선택==</option> 이 태그에 작성되어져 있는 value 값과 같기 때문에
+            해당 태그에 selected="selected" 속성 값이 자동으로 작성되어진다.
+        -->
+        <select th:field="${item.deliveryCode}" class="form-select" disabled>
+            <option value="">==배송 방식 선택==</option>
+            <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                    th:text="${deliveryCode.displayName}">FAST</option>
+        </select>
+    </div>
+
+    <hr class="my-4">
+
+
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"

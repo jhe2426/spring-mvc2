@@ -1,5 +1,6 @@
 package hello.itemservice.web.form;
 
+import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
@@ -10,10 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -39,6 +37,17 @@ public class FormItemController {
     public ItemType[] itemTypes() {
         // ItemType.values()를 사용하면 해당 ENUM의 모든 정보를 배열로 반환해준다.
         return ItemType.values();
+    }
+
+    // @ModelAttribute가 붙은 메서드는 이 클래스의 컨트롤러가 호출될 때마다 사용되므로 해당 메서드에 객체를 생성하는 코드가 있다면
+    // 이 클래스 컨트롤러가 호출될 때마다 해당 객체를 새롭게 계속 생성하게 된다. 이 부분은 미리 static으로 미리 생성해두고 재사용하는 것이 효율적이다.
+    @ModelAttribute("deliveryCodes")
+    public List<DeliveryCode> deliveryCodes() {
+        List<DeliveryCode> deliveryCodes = new ArrayList<>();
+        deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송"));
+        deliveryCodes.add(new DeliveryCode("NORMAL", "일반 배송"));
+        deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
+        return deliveryCodes;
     }
 
     @GetMapping
@@ -67,6 +76,7 @@ public class FormItemController {
         log.info("item.open={}", item.getOpen());
         log.info("item.regions={}", item.getRegions());
         log.info("item.itemType={}", item.getItemType());
+        log.info("item.deliveryCode={}", item.getDeliveryCode());
 
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
