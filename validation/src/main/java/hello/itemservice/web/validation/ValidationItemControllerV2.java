@@ -47,6 +47,12 @@ public class ValidationItemControllerV2 {
 
     @PostMapping("/add")
     public String addItemV1(
+            /*
+                @ModelAttribute에 바인딩 시 타입 오류가 발생하면?
+                    'BindingResult'가 없으면 -> 400 오류가 발생하면서 컨트롤러가 호출되지 않고, 오류 페이지로 이동
+                    'BindingResult'가 있으면 -> 오류 정보('FieldError를 생성해서)를
+                        'BindingResult'에 담아서 컨트롤러를 정상 호출한다.
+            */
             // 주의 BindingResult bindingResult  파라미터의 위치는 @ModelAttribute Item item 다음에 와야 한다.
                 // bindingResult는 검증 결과의 대상이 되는 객체가 필요한데 bindingResult의 바로 앞에 위치한 @ModelAttribute 객체를
                 // 검증 결과로 인식하기 때문이다.
