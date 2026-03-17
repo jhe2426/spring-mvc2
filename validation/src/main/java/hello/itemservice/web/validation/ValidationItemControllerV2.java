@@ -45,7 +45,7 @@ public class ValidationItemControllerV2 {
         return "validation/v2/addForm";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV1(
             /*
                 @ModelAttribute에 바인딩 시 타입 오류가 발생하면?
@@ -91,6 +91,81 @@ public class ValidationItemControllerV2 {
             log.info("errors = {} ", bindingResult);
             // bindingResult는 뷰로 자동으로 넘어가기 때문에 errors처럼 모델에 값을 넣어주지 않아도 됨
             // model.addAttribute("errors", errors);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV2(
+            /*
+                사용자의 입력 데이터가 컨트롤러의 @ModelAttribute에 바인딩되는 시점에 오류가 발생하면 모델 객체에 사용자 입력 값을 유지하기 어렵다.
+                예를 들어서 가격에 숫자가 아닌 문자가 입력된다면 가격은 Integer 타입이므로 문자를 보관할 수 있는 방법이 없다.
+                그래서 화면에 표시하기가 어렵기 때문에 오류가 발생한 경우 사용자 입력 값을 보관하는 별도의 방법이 필요함
+                그래서 FieldError는 오류 발생 시 사용자 입력 값을 저장하는 기능을 제공함
+                만약 가격에 숫자가 아닌 qqq를 입력하게 되면 일단 Item 객체를 new Item() 기본 생성자로 생성을 한 후 필드를 바인딩 하는 과정에서 타입 에러가 발생하는데 이를
+                bindingResult에서 매핑할 때 price에 타입 에러가 발생한 것을 감지하여 아래와 같은 FieldError 자동으로 생성해서 bindingResult에 추가를 해준다.
+                또한 타입 에러가 발생하더라도 예외가 발생하지 않고, 해당 오류는 BindingResult에 저장되기 때문에 컨트롤러 내부에 작성된 코드는 정상적으로 실행된다.
+                bindingResult.addError(new FieldError("item", "price", "qqq", true, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+                rejectedValue 파라미터 부분에 사용자가 입력한 값을 넣어주고, bindingFailure 파라미터 부분에 타입 오류 같은 바인딩 실패인지를 표시하기 위해 true를 넣어준다.
+
+                th:field="*{price}" 여기서 타임리프의 th:field는 정상 상황에서는 모델 객체의 값을 사용하지만,
+                오류가 발생하면 FieldError에서 보관한 값을 사용해서 값을 출력해줌
+            */
+            @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model
+    ) {
+
+        // 검증 로직
+        /*
+            FieldError는 두가지 생성자가 존재
+            1. public FieldError(String objectName, String field, String defaultMessage);
+            2. public FieldError(String objectName, String field, @Nullable Object
+                rejectedValue, boolean bindingFailure, @Nullable String[] codes, @Nullable Object[] arguments, @Nullable String defaultMessage)
+                    objectName: 오류가 발생한 객체 이름
+                    field: 오류가 발생한 필드
+                    rejectedValue: 사용자가 입력한 값(사용자가 정상적으로 입력하지 않아 거절된 값)
+                    bindingFailure: 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값(true: 타입 오류 같은 바인딩 실패, false: 검증 실패)
+                    codes: 메시지 코드
+                    arguments: 메시지에서 사용하는 인자
+                    defaultMessage: 기본 오류 메시지
+        */
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
+        }
+
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            /*
+                왜 V1 코드에서는 이 구문을 실행하면 왜 사용자가 입력한 값이 안 보였나?
+                bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+                V1일 때 검증 실패가 일어나면 위와 같은 코드가 살행되게 되는데 위의 코드에는 rejectedValue 즉, 사용자가 입력한 값을 지정해주는
+                매개변수에 값을 넣지 않고 있고, 타임리프는 에러가 발생하면 모델에서 전달한 객체 필드의 값을 출력해주는 것이 아닌
+                FieldError로 생성된 rejectedValue 값을 출력해주게 되는데 rejectedValue 값이 비워있으므로 V1일 때 검증 에러가 발생하면
+                해당 입력 값은 화면에 보여지지 않게 된 것이다. 타입 오류는 V1도 화면에 출력이 되었는데 이것은 bindingResult가 자동적으로
+                생성해주는 FieldError를 사용했기 때문이다.
+            */
+            bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+        }
+
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(), false, null, null, "수량은 최대 9,999 까지 허용합니다."));
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
             return "validation/v2/addForm";
         }
 
