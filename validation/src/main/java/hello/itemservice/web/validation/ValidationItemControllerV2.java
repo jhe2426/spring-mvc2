@@ -178,7 +178,7 @@ public class ValidationItemControllerV2 {
     }
 
 //    @PostMapping("/add")
-    public String addItemV4(
+    public String addItemV3(
             @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model
     ) {
         // 검증 로직
@@ -216,7 +216,7 @@ public class ValidationItemControllerV2 {
     }
 
     @PostMapping("/add")
-    public String addItemV3(
+    public String addItemV4(
             @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model
     ) {
 
@@ -235,8 +235,8 @@ public class ValidationItemControllerV2 {
         }
         // 위의 코드를 아래와 같이 한 줄 코드로도 작성을 할 수 있음 (제공하는 기능은 Empty, 공백 같은 단순한 기능만 제공)
         // ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
-
-        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        
+        if ((item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) && !bindingResult.hasErrors()) {
             bindingResult.rejectValue("price", "range", new Object[]{1000, 10000000}, null);
         }
 
