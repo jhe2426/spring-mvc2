@@ -11,6 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -26,6 +28,12 @@ public class ValidationItemControllerV2 {
 
     private final ItemRepository itemRepository;
     private final ItemValidator itemValidator;
+
+    // 컨트롤러가 호출될 때마다 WebDataBinder가 생성된다.
+    @InitBinder
+    public void init(WebDataBinder dataBinder) {
+        dataBinder.addValidators(itemValidator);
+    }
 
     @GetMapping
     public String items(Model model) {
@@ -267,7 +275,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV5(
             @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model
     ) {
@@ -275,6 +283,30 @@ public class ValidationItemControllerV2 {
        if (itemValidator.supports(item.getClass())) {
             itemValidator.validate(item, bindingResult);
        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV6(
+            /*
+                @Validated는 검증기를 실행하라는 애노테이션이다.
+                이 애노테이션이 붙으면 앞서 WebDataBinder에 등록한 검증기를 찾아서 실행한다.
+                이때 WebDataBinder에 여러 개의 검증기를 등록할 수 있는데 이 경우에는 supports(Item.class)가 호출되고,
+                결과가 true인 검증기의 validate() 실행시켜 준다.
+            */
+            @Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model
+    ) {
 
         // 검증에 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
