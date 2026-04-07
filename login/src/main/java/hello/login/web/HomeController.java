@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Slf4j
 @Controller
@@ -42,7 +43,7 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/")
+//    @GetMapping("/")
     public String homeLoginV2(HttpServletRequest request, Model model) {
 
         // 세션 관리자에 저장된 회원 정보를 조회
@@ -54,6 +55,28 @@ public class HomeController {
         }
 
         model.addAttribute("member", member);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV3(HttpServletRequest request, Model model) {
+
+        // 홈화면은 로그인하지 않은 사용자들도 많이 들아오는 페이지인데 getSession(true)이면 로그인할지도 안 할지도 모르는 사용자들에 전부 다
+        // 세션을 만들어주기 때문에 이거는 메모리 낭비이다.
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "home";
+        }
+
+        Member loginMember = (Member)session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+        // 세션에 회원 데이터가 없으면 home
+        if (loginMember == null) {
+            return "home";
+        }
+
+        // 세션이 유지되면 로그인된 홈화면으로 이동
+        model.addAttribute("member", loginMember);
         return "loginHome";
     }
 }
