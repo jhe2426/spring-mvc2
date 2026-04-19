@@ -28,6 +28,32 @@ public class ServletExController {
         response.sendError(404, "404 오류!");
     }
 
+    @GetMapping("/error-400")
+    public void error400(HttpServletResponse response) throws IOException {
+        /*
+            스프링 부트가 제공하는 오류 페이지 처리
+                스프링 부트가 제공하는 BasicErrorController에 기본적이 로직이 모두 개발이 되어있다.
+                그래서 개발자는 오류 페이지 화면만 BasicErrorController가 제공하는 툴과 우선순위에 따라서 등록하면 됨
+
+            BasicErrorController의 처리 순서
+            1. 뷰 템플릿
+                resources/templates/error/500.html
+                resources/templates/error/5xx.html
+
+            2. 정적 리소스(static, public)
+                resources/static/error/400.html
+                resources/static/error/404.html
+                resources/static/error/4xx.html
+
+            3. 적용 대상이 없을 때 뷰 이름(error)
+                resources/templates/error.html
+
+            위의 경로 위치에 HTTP 상태 코드 이름의 뷰 파일을 넣어두면 해당 에러 발생시 에러 페이지가 화면에 보여지게 된다.
+            뷰 템플릿이 정적 리소스보다 우선순이가 놓고, 404, 500처럼 구체적인 것이 4xx, 5xx처럼 덜 구체적인 것보다 우선순위가 높다.
+        */
+        response.sendError(400, "400 오류!");
+    }
+
     @GetMapping("/error-500")
     public void error500(HttpServletResponse response) throws IOException {
         response.sendError(500);
