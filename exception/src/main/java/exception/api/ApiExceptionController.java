@@ -1,5 +1,6 @@
 package exception.api;
 
+import exception.exception.UserException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,10 @@ public class ApiExceptionController {
 
         if (id.equals("bad")) {
             throw new IllegalArgumentException("잘못된 입력 값");
+        }
+
+        if (id.equals("user-ex")) {
+            throw new UserException("사용자 오류");
         }
 
         return new MemberDto(id, "hello " + id);
