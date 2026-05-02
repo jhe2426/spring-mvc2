@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form th:object="${form}" th:method="post">
+    <!--
+        th:field="*{ipPort}"는
+            - form 객체의 ipPort와 input을 바인딩
+            - name, id, value를 자동으로 생성을 해주고 submit시 서버로 값을 전달
+            - value도 자동으로 ipPort값으로 생성이 되는데 컨버전 서비스가 자동으로 적용이 된 값으로 생성을 해줌
+    -->
+    th:field <input type="text" th:field="*{ipPort}"><br/>
+
+    <!--
+        th:value는 단순 출력용이지 해당 input 태그 내부에 name이 없어 submit 시 값이 서버로 전달되지 않음
+    -->
+    th:value <input type="text" th:value="*{ipPort}">(보여주기 용도)<br/>
+    <input type="submit"/>
+</form>
+
+</body>
+</html>

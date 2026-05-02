@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul>
+    <!--
+        변수 표현식: ${...}
+        컨버전 서비스 적용: ${{...}}
+        ${{number}}: 뷰 템플릿은 데이터를 문자로 출력을 함 그래서 컨버터를 적용하게 되면 Integer 타입인 10000을 String 타입으로 변환하는
+            컨버터인 IntegerToStringConverter를 실행하게 됨. 근데 이 부분은 컨버터를 실행하지 않아도 타임리프가 숫자를 문자로 자동으로
+            변환하기 때문에 컨버터를 적용할 때와 하지 않을 때가 같음
+        ${{ipPort}}: 문자로 출력을 하기때문에 IpPort타입을 String타입으로 변환하는 IpPortToStringConverter가 적용이 됨
+    -->
+    <li>${number}: <span th:text="${number}" ></span></li>
+    <li>${{number}}: <span th:text="${{number}}" ></span></li>
+    <li>${ipPort}: <span th:text="${ipPort}" ></span></li>
+    <li>${{ipPort}}: <span th:text="${{ipPort}}" ></span></li>
+</ul>
+
+</body>
+</html>
